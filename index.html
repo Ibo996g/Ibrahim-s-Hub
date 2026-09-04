@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ibrahim's Hub - Modern, fast, and privacy-first client-side web tools and utilities.">
+  <title>Ibrahim's Hub</title>
+  
+  <style>
+    /* ==========================================================================
+       1. CSS Reset, Design Tokens & Global Variables
+       ========================================================================== */
+    :root {
+      /* Brand Color Palette (Clean White & Electric Blue) */
+      --color-primary: #2563eb;         /* Royal Electric Blue */
+      --color-primary-hover: #1d4ed8;   /* Deep Blue */
+      --color-primary-light: #eff6ff;   /* Soft Blue Wash */
+      --color-primary-glow: rgba(37, 99, 235, 0.28);
+      --color-accent-cyan: #00f0ff;     /* Cyberpunk Turquoise */
+      --color-accent-pink: #ff0055;     /* Cyberpunk Neon Pink */
+      
+      /* Neutral Palette */
+      --color-bg-page: #f8fafc;        /* Ultra-clean Slate White */
+      --color-bg-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-hover: #93c5fd;
+      --color-text-main: #0f172a;       /* Deep Slate Navy */
+      --color-text-muted: #64748b;      /* Slate Grey */
+      --color-text-light: #94a3b8;
+      
+      /* Glassmorphism Variables */
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --glass-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      
+      /* Layout & Typography */
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-apple-modal: 2rem;       /* Strictly 2rem as requested */
+      
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+      --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+      --shadow-card-hover: 0 20px 30px -8px var(--color-primary-glow), 0 0 0 1.5px rgba(37, 99, 235, 0.35);
+      
+      --max-width: 1200px;
+      --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-page);
+      color: var(--color-text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+      /* Subtle geometric grid background pattern */
+      background-image: 
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 40%),
+        linear-gradient(to right, rgba(226, 232, 240, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(226, 232, 240, 0.35) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    /* ==========================================================================
+       2. Top Navigation & Cyberpunk Glitch Animation Logo
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--color-border);
+      width: 100%;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .header-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Platform Brand Container */
+    .brand-logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* -------------------------------------------------------------
+       CYBERPUNK 2077 GLITCH ANIMATION (STRICTLY ON THE INITIAL "I")
+       ------------------------------------------------------------- */
+    .cyberpunk-icon-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: #0f172a;
+      border-radius: 8px;
+      margin-right: 6px;
+      border: 1px solid rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(255, 0, 85, 0.25);
+      overflow: visible;
+    }
+
+    .cyber-glitch-i {
+      position: relative;
+      font-family: 'Impact', 'Arial Black', var(--font-mono), sans-serif;
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      display: inline-block;
+      text-transform: uppercase;
+      animation: cyberGlitchJitter 2.2s infinite steps(2, start);
+    }
+
+    /* Neon Turquoise & Pink Chromatic Aberration Pseudo-Layers */
+    .cyber-glitch-i::before,
+    .cyber-glitch-i::after {
+      content: "I";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    /* Turquoise / Cyan Split Layer */
+    .cyber-glitch-i::before {
+      color: var(--color-accent-cyan);
+      text-shadow: 0 0 4px var(--color-accent-cyan);
+      left: -2px;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      animation: cyberCyanAberration 1.9s infinite linear alternate-reverse;
+      opacity: 0.9;
+    }
+
+    /* Neon Pink / Magenta Split Layer */
+    .cyber-glitch-i::after {
+      color: var(--color-accent-pink);
+      text-shadow: 0 0 4px var(--color-accent-pink);
+      left: 2px;
+      clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+      animation: cyberPinkAberration 1.7s infinite linear alternate-reverse;
+      opacity: 0.9;
+    }
+
+    /* Aggressive Cyberpunk 2077 Glitch Keyframes */
+    @keyframes cyberGlitchJitter {
+      0%   { transform: translate(0, 0) skew(0deg); }
+      2%   { transform: translate(-3px, 2px) skew(-5deg); }
+      4%   { transform: translate(3px, -2px) skew(4deg); }
+      6%   { transform: translate(0, 0) skew(0deg); }
+      18%  { transform: translate(0, 0) skew(0deg); }
+      20%  { transform: translate(-2px, -1px) skew(-3deg); }
+      22%  { transform: translate(2px, 1px) skew(3deg); }
+      24%  { transform: translate(0, 0) skew(0deg); }
+      50%  { transform: translate(0, 0) skew(0deg); }
+      52%  { transform: translate(-4px, 1px) skew(6deg); filter: drop-shadow(-2px 0 var(--color-accent-cyan)); }
+      54%  { transform: translate(3px, -1px) skew(-4deg); filter: drop-shadow(2px 0 var(--color-accent-pink)); }
+      56%  { transform: translate(0, 0) skew(0deg); filter: none; }
+      82%  { transform: translate(0, 0) skew(0deg); }
+      84%  { transform: translate(2px, -2px) skew(4deg); }
+      86%  { transform: translate(-3px, 1px) skew(-5deg); }
+      88%  { transform: translate(0, 0) skew(0deg); }
+      100% { transform: translate(0, 0) skew(0deg); }
+    }
+
+    @keyframes cyberCyanAberration {
+      0%   { clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); transform: translate(-2px, 0); }
+      20%  { clip-path: polygon(0 40%, 100% 40%, 100% 70%, 0 70%); transform: translate(1px, -1px); }
+      40%  { clip-path: polygon(0 15%, 100% 15%, 100% 50%, 0 50%); transform: translate(-3px, 1px); }
+      60%  { clip-path: polygon(0 60%, 100% 60%, 100% 90%, 0 90%); transform: translate(2px, 0); }
+      80%  { clip-path: polygon(0 10%, 100% 10%, 100% 40%, 0 40%); transform: translate(-1px, 2px); }
+      100% { clip-path: polygon(0 25%, 100% 25%, 100% 75%, 0 75%); transform: translate(-2px, 0); }
+    }
+
+    @keyframes cyberPinkAberration {
+      0%   { clip-path: polygon(0 45%, 100% 45%, 100% 100%, 0 100%); transform: translate(2px, 0); }
+      25%  { clip-path: polygon(0 10%, 100% 10%, 100% 55%, 0 55%); transform: translate(-2px, 1px); }
+      50%  { clip-path: polygon(0 65%, 100% 65%, 100% 95%, 0 95%); transform: translate(3px, -1px); }
+      75%  { clip-path: polygon(0 30%, 100% 30%, 100% 80%, 0 80%); transform: translate(-1px, 0); }
+      100% { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%); transform: translate(2px, 0); }
+    }
+
+    /* Completely Stable & Modern Text for the Rest of the Brand */
+    .brand-text-stable {
+      color: var(--color-text-main);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-text-accent {
+      color: var(--color-primary);
+      margin-left: 0.15rem;
+    }
+
+    /* Header Controls */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.35rem 0.75rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #166534;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+      animation: pulseGreen 2s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.75; }
+    }
+
+    .header-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 0.95rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .header-action-btn:hover {
+      background: #dbeafe;
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       3. Hero Section & Search / Filter Controls
+       ========================================================================== */
+    .hero-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.35rem 1rem;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      color: var(--color-text-main);
+      margin-bottom: 1.1rem;
+    }
+
+    .hero-title-highlight {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 680px;
+      margin: 0 auto 2rem auto;
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    /* Search & Filter Bar */
+    .controls-wrapper {
+      max-width: 720px;
+      margin: 0 auto 2.5rem auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .search-input-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input-box svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--color-text-light);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.85rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      color: var(--color-text-main);
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      background: #ffffff;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .filter-btn:hover {
+      border-color: var(--color-border-hover);
+      color: var(--color-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    /* ==========================================================================
+       4. Service Cards (The Tools Grid)
+       ========================================================================== */
+    .tools-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .section-meta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tools-count-badge {
+      font-size: 0.75rem;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    /* Responsive Grid: 3 columns desktop, 2 tablet, 1 mobile */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 1.15rem;
+      }
+    }
+
+    /* Service Card Design & Hover Animation */
+    .service-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.6rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-smooth);
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      overflow: hidden;
+    }
+
+    /* Glowing Top Accent Strip */
+    .service-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Card Hover Animations: Scaling & Blue Glow */
+    .service-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: var(--color-border-hover);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-card:hover .card-action-link {
+      color: var(--color-primary);
+      transform: translateX(4px);
+    }
+
+    .service-card:hover .card-icon-container {
+      background: #dbeafe;
+      color: var(--color-primary-hover);
+      transform: scale(1.08);
+    }
+
+    /* Card Header */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.1rem;
+    }
+
+    .card-icon-container {
+      width: 48px;
+      height: 48px;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .card-icon-container svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      background: #f1f5f9;
+      color: var(--color-text-muted);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Card Content */
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .card-description {
+      font-size: 0.885rem;
+      color: var(--color-text-muted);
+      line-height: 1.55;
+      margin-bottom: 1.35rem;
+      flex-grow: 1;
+    }
+
+    /* Card Footer */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+      margin-top: auto;
+    }
+
+    .card-spec-tag {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+
+    .card-action-link {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition-smooth);
+    }
+
+    /* Hidden cards during search */
+    .service-card.is-hidden {
+      display: none !important;
+    }
+
+    /* ==========================================================================
+       5. Apple-Style Delayed Modal (Glassmorphism & Physics Spring Animation)
+       ========================================================================== */
+    /* Blurred Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(15, 23, 42, 0.42);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+    }
+
+    .modal-backdrop.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Apple-Style Glassmorphism Modal Window */
+    .apple-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -150vh) scale(0.9);
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(32px) saturate(190%);
+      -webkit-backdrop-filter: blur(32px) saturate(190%);
+      border-radius: var(--radius-apple-modal); /* Exactly 2rem */
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      padding: 2.25rem 2.25rem 2rem 2.25rem;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Entry Animation: Drops with Apple-Style Physics Spring/Bounce */
+    .modal-backdrop.is-active .apple-modal {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      animation: appleSpringDrop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Exit Animation: Swiftly slides back up to the top */
+    .modal-backdrop.is-closing .apple-modal {
+      animation: appleSlideUpExit 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .modal-backdrop.is-closing {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    @keyframes appleSpringDrop {
+      0% {
+        transform: translate(-50%, -130vh) scale(0.85);
+        opacity: 0;
+      }
+      60% {
+        transform: translate(-50%, -46%) scale(1.02);
+        opacity: 1;
+      }
+      80% {
+        transform: translate(-50%, -52%) scale(0.995);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes appleSlideUpExit {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      30% {
+        transform: translate(-50%, -46%) scale(1.01);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -135vh) scale(0.88);
+        opacity: 0;
+      }
+    }
+
+    /* Modal Interior Styling */
+    .modal-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--color-primary);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(37, 99, 235, 0.15);
+    }
+
+    .modal-header-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--color-text-main);
+      margin-bottom: 0.35rem;
+      line-height: 1.25;
+    }
+
+    .modal-header-sub {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Content Cards for 3 Required Statements */
+    .modal-items-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .modal-item-box {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.15rem;
+      font-size: 0.885rem;
+      line-height: 1.55;
+      color: var(--color-text-main);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.03);
+    }
+
+    /* Modal Interactive Controls (Checkbox & Agree Button) */
+    .modal-footer-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .modal-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    /* Custom Modern Checkbox */
+    .modal-checkbox-input {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      flex-shrink: 0;
+    }
+
+    .modal-checkbox-input::before {
+      content: "";
+      width: 10px;
+      height: 6px;
+      border-left: 2.5px solid #ffffff;
+      border-bottom: 2.5px solid #ffffff;
+      transform: rotate(-45deg) scale(0);
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-bottom: 2px;
+    }
+
+    .modal-checkbox-input:checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .modal-checkbox-input:checked::before {
+      transform: rotate(-45deg) scale(1);
+    }
+
+    /* Continue Button: Grayed out and disabled by default */
+    .btn-modal-continue {
+      width: 100%;
+      padding: 0.95rem 1.5rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-align: center;
+      transition: var(--transition-smooth);
+      
+      /* Disabled Default State */
+      background: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      pointer-events: none;
+      box-shadow: none;
+    }
+
+    /* Active Enabled State when Checkbox is Checked */
+    .btn-modal-continue.is-active {
+      background: var(--color-primary);
+      color: #ffffff;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 10px 22px -5px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-modal-continue.is-active:hover {
+      background: var(--color-primary-hover);
+      transform: translateY(-1.5px);
+      box-shadow: 0 14px 26px -6px rgba(37, 99, 235, 0.55);
+    }
+
+    .btn-modal-continue.is-active:active {
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       6. Security Toast (Feedback for blocked shortcuts/contextmenu)
+       ========================================================================== */
+    .security-toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 9999;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      padding: 0.85rem 1.35rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .security-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .security-toast-icon {
+      color: #f87171;
+    }
+
+    /* ==========================================================================
+       7. Site Footer
+       ========================================================================== */
+    .site-footer {
+      background: #ffffff;
+      border-top: 1px solid var(--color-border);
+      padding: 2.5rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .footer-btn-review {
+      cursor: pointer;
+      color: var(--color-primary);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .footer-btn-review:hover {
+      color: var(--color-primary-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP HEADER & NAVIGATION
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo with Cyberpunk 2077 Glitched 'I' -->
+      <a href="#" class="brand-logo-link" title="Ibrahim's Hub">
+        <span class="cyberpunk-icon-wrapper" aria-label="Cyberpunk animated icon">
+          <!-- Continuous Cyberpunk 2077 Glitch is strictly applied to this initial 'I' -->
+          <span class="cyber-glitch-i" data-text="I">I</span>
+        </span>
+        <span class="brand-text-stable">brahim's<span class="brand-text-accent">Hub</span></span>
+      </a>
+
+      <!-- Header Utilities -->
+      <nav class="header-nav">
+        <button type="button" class="header-action-btn" id="btn-reopen-modal" title="View Privacy & Disclaimer Notice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Privacy & Terms</span>
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN HERO SECTION
+       ======================================================================== -->
+  <main>
+    <section class="hero-section">
+      <h1 class="hero-title">
+        The Modern Web Suite at <br>
+        <span class="hero-title-highlight">Ibrahim's Hub</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        High-performance, client-side developer utilities and document tools. 
+        Engineered to execute instantly on your hardware with 100% privacy.
+      </p>
+
+      <!-- Search & Category Filters -->
+      <div class="controls-wrapper">
+        <div class="search-input-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="tool-search" class="search-input" placeholder="Search service cards (e.g. PDF, Image, Hash, JSON)..." autocomplete="off">
+        </div>
+
+        <div class="filter-tags" id="filter-container">
+          <button type="button" class="filter-btn active" data-filter="all">All Services</button>
+          <button type="button" class="filter-btn" data-filter="Documents">Documents</button>
+          <button type="button" class="filter-btn" data-filter="documents">Document Tools</button>
+          <button type="button" class="filter-btn" data-filter="developer">Developer Utilities</button>
+          <button type="button" class="filter-btn" data-filter="media">Media & Web</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SERVICE CARDS GRID (3 CLEAN ACTIVE CARDS)
+         ======================================================================== -->
+    <section class="tools-section">
+      <div class="section-meta-header">
+        <h2 class="section-title">
+          <span>Available Tools</span>
+          <span class="tools-count-badge" id="tools-counter">3 Active</span>
+        </h2>
+        <span style="font-size: 0.8rem; color: var(--color-text-muted);">Click any card to launch</span>
+      </div>
+
+      <div class="services-grid" id="services-grid">
+
+        <!-- Tool 1: PDF Suite -->
+        <a href="https://ibo996g.github.io/smart_document_organizer/" class="service-card" data-category="documents" target="_blank" rel="noopener noreferrer">
+          <div class="card-header">
+            <div class="card-icon-container">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <span class="card-badge">Documents</span>
+          </div>
+          <h3 class="card-title">Cropping and arranging documents</h3>
+          <p class="card-description">
+            A website featuring a free drag-and-drop interface for organizing, cropping, and managing document pages.
+          </p>
+          <div class="card-footer">
+            <span class="card-spec-tag">🔒 100% In-Memory</span>
+            <span class="card-action-link">Launch Tool &rarr;</span>
+          </div>
+        </a>
+
+        <!-- Tool 2: Password Generator -->
+        <a href="https://ibo996g.github.io/jpgtopdf/" class="service-card" data-category="privacy">
+          <div class="card-header">
+            <div class="card-icon-container">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <span class="card-badge">Documents</span>
+          </div>
+          <h3 class="card-title">PDF Merge & Splitter</h3>
+          <p class="card-description">
+           A tool for processing PDF files—splitting, merging, and fully rearranging pages—directly within the browser with 100% privacy.
+          </p>
+          <div class="card-footer">
+            <span class="card-spec-tag">🔑 CSPRNG Random</span>
+            <span class="card-action-link">Launch Tool &rarr;</span>
+          </div>
+        </a>
+
+        <!-- Tool 3: Smart Image Optimizer -->
+        <a href="https://ibo996g.github.io/Offline-Telegram/" class="service-card" data-category="media">
+          <div class="card-header">
+            <div class="card-icon-container">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span class="card-badge">Media And File</span>
+          </div>
+          <h3 class="card-title">Smart Image Optimizer</h3>
+          <p class="card-description">
+An application for transferring files and text between different devices connected to the same Wi-Fi network, featuring strong encryption.          </p>
+          <div class="card-footer">
+            <span class="card-spec-tag">⚡ Local Compress</span>
+            <span class="card-action-link">Launch Tool &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       APPLE-STYLE DELAYED MODAL (5-SECOND DELAY + SPRING PHYSICS + GLASS)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="terms-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="apple-modal" id="apple-modal-box">
+      
+      <!-- Modal Header -->
+      <div class="modal-pill-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Important User Notice</span>
+      </div>
+
+      <h2 class="modal-header-title" id="modal-title">Welcome to Ibrahim's Hub</h2>
+      <p class="modal-header-sub">Please review and confirm our operational principles before continuing.</p>
+
+      <!-- Content Cards -->
+      <div class="modal-items-container">
+        <!-- Requirement 1: 100% Local Processing -->
+        <div class="modal-item-box">
+          🔒 100% Local Processing: Your privacy is our priority. All document processing is done entirely on your device. We do not upload, store, or save any of your personal data or files on our servers.
+        </div>
+
+        <!-- Requirement 2: Disclaimer -->
+        <div class="modal-item-box">
+          ⚖️ Disclaimer: By using our tools, you agree to use them responsibly and for lawful purposes only. We hold no responsibility for any misuse of the generated documents.
+        </div>
+
+        <!-- Requirement 3: Support Our Work -->
+        <div class="modal-item-box">
+          ☕ Support Our Work: If you find our free services helpful, please consider supporting us to keep this project alive and ad-free!
+        </div>
+      </div>
+
+      <!-- Footer Checkbox & Agree Button -->
+      <div class="modal-footer-controls">
+        <label class="modal-checkbox-label" for="terms-agreement-checkbox">
+          <input type="checkbox" id="terms-agreement-checkbox" class="modal-checkbox-input">
+          <span>I have read and agree to the terms</span>
+        </label>
+
+        <!-- Disabled and grayed out by default -->
+        <button type="button" id="btn-agree-continue" class="btn-modal-continue" disabled>
+          I Agree & Continue
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SECURITY WARNING TOAST (PROTECTION ACTIVE)
+       ======================================================================== -->
+  <div class="security-toast" id="security-toast">
+    <svg class="security-toast-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    <span id="security-toast-msg">Action disabled for source code protection.</span>
+  </div>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+ <footer class="site-footer">
+  <div class="footer-container" style="justify-content: center; text-align: center;">
+    <div class="footer-center">
+      <span>&copy; <span id="current-year"></span> Ibrahim's Hub. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+  <!-- ========================================================================
+       PURE JAVASCRIPT: MODAL LOGIC, SECURITY SHIELD & INTERACTION
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // 1. Footer Year Auto-update
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+
+      // ======================================================================
+      // 2. APPLE-STYLE DELAYED MODAL LOGIC (EXACTLY 5-SECOND DELAY)
+      // ======================================================================
+      const modalBackdrop = document.getElementById('terms-modal-backdrop');
+      const termsCheckbox = document.getElementById('terms-agreement-checkbox');
+      const continueButton = document.getElementById('btn-agree-continue');
+      const reopenModalBtn = document.getElementById('btn-reopen-modal');
+
+      let hasModalBeenClosed = false;
+
+      // Helper function to trigger modal entry
+      function openAppleModal() {
+        modalBackdrop.classList.remove('is-closing');
+        modalBackdrop.classList.add('is-active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      }
+
+      // Helper function to close modal with swift upward slide
+      function closeAppleModal() {
+        modalBackdrop.classList.add('is-closing');
+        
+        setTimeout(() => {
+          modalBackdrop.classList.remove('is-active', 'is-closing');
+          document.body.style.overflow = ''; // Restore scrolling & interactions
+          hasModalBeenClosed = true;
+        }, 420);
+      }
+
+      // Trigger modal after exactly 5 seconds (5000ms)
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          if (!hasModalBeenClosed) {
+            openAppleModal();
+          }
+        }, 5000);
+      });
+
+      // Re-open button listener
+      if (reopenModalBtn) reopenModalBtn.addEventListener('click', openAppleModal);
+
+      // Checkbox state listener
+      termsCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+          continueButton.removeAttribute('disabled');
+          continueButton.classList.add('is-active');
+        } else {
+          continueButton.setAttribute('disabled', 'true');
+          continueButton.classList.remove('is-active');
+        }
+      });
+
+      // Continue Button click listener
+      continueButton.addEventListener('click', function () {
+        if (!this.disabled && termsCheckbox.checked) {
+          closeAppleModal();
+        }
+      });
+
+      // ======================================================================
+      // 3. SECURITY MEASURES: SOURCE CODE PROTECTION
+      // ======================================================================
+      const toast = document.getElementById('security-toast');
+      const toastMsg = document.getElementById('security-toast-msg');
+      let toastTimeout = null;
+
+      function showSecurityToast(message) {
+        toastMsg.textContent = message || 'Action disabled for source code protection.';
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+
+      // Disable right-click
+      document.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        showSecurityToast('Right-click context menu is disabled.');
+        return false;
+      }, { capture: true });
+
+      // Disable developer shortcuts
+      document.addEventListener('keydown', function (event) {
+        const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+        const isShift = event.shiftKey;
+        const isAlt = event.altKey;
+        const key = event.key ? event.key.toUpperCase() : '';
+        const keyCode = event.keyCode || event.which;
+
+        // F12
+        if (event.key === 'F12' || keyCode === 123) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('Developer tools (F12) are disabled.');
+          return false;
+        }
+
+        // Ctrl + Shift + I / Cmd + Option + I
+        if (isCtrlOrCmd && (isShift || isAlt) && (key === 'I' || keyCode === 73)) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('Inspect shortcut is disabled.');
+          return false;
+        }
+
+        // Ctrl + Shift + J / Cmd + Option + J
+        if (isCtrlOrCmd && (isShift || isAlt) && (key === 'J' || keyCode === 74)) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('Console shortcut is disabled.');
+          return false;
+        }
+
+        // Ctrl + Shift + C
+        if (isCtrlOrCmd && (isShift || isAlt) && (key === 'C' || keyCode === 67)) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('Element inspect is disabled.');
+          return false;
+        }
+
+        // Ctrl + U
+        if (isCtrlOrCmd && (key === 'U' || keyCode === 85)) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('View page source (Ctrl+U) is disabled.');
+          return false;
+        }
+
+        // Ctrl + S
+        if (isCtrlOrCmd && (key === 'S' || keyCode === 83)) {
+          event.preventDefault();
+          event.stopPropagation();
+          showSecurityToast('Saving page source (Ctrl+S) is disabled.');
+          return false;
+        }
+      }, { capture: true });
+
+      // ======================================================================
+      // 4. CLIENT-SIDE SEARCH & CATEGORY FILTERING
+      // ======================================================================
+      const searchInput = document.getElementById('tool-search');
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const cards = document.querySelectorAll('.service-card');
+      const countBadge = document.getElementById('tools-counter');
+
+      let currentCategory = 'all';
+      let searchQuery = '';
+
+      function filterCards() {
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const cardCategories = (card.getAttribute('data-category') || '').toLowerCase();
+          const cardTitle = card.querySelector('.card-title').textContent.toLowerCase();
+          const cardDesc = card.querySelector('.card-description').textContent.toLowerCase();
+
+          const matchesCategory = (currentCategory === 'all') || cardCategories.includes(currentCategory);
+          const matchesSearch = !searchQuery || cardTitle.includes(searchQuery) || cardDesc.includes(searchQuery);
+
+          if (matchesCategory && matchesSearch) {
+            card.classList.remove('is-hidden');
+            visibleCount++;
+          } else {
+            card.classList.add('is-hidden');
+          }
+        });
+
+        if (countBadge) {
+          countBadge.textContent = `${visibleCount} Active`;
+        }
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+          searchQuery = e.target.value.trim().toLowerCase();
+          filterCards();
+        });
+      }
+
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function () {
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          currentCategory = this.getAttribute('data-filter') || 'all';
+          filterCards();
+        });
+      });
+
+      // Initial filter calculation
+      filterCards();
+
+    })();
+  </script>
+</body>
+</html>
